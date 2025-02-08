@@ -2,8 +2,6 @@
 
 A specialized interface for exploring cutting-edge medical research papers from arXiv, focusing on clinical trials, epidemiology, and biomedical studies.
 
-Try it out: [Medgram](https://papergram.netlify.app/)
-
 ## 🌟 Features
 
 ### Paper Discovery
@@ -38,12 +36,12 @@ Try it out: [Medgram](https://papergram.netlify.app/)
 
 1. Clone the repository:
 ```bash
-git https://github.com/cneuralnetwork/papergram.git
+git clone https://github.com/wysh3/medgram.git
 ```
 
 2. Navigate to the project directory:
 ```bash
-cd papergram
+cd medgram
 ```
 
 3. Open `index.html` in your browser or use a local server:
@@ -69,4 +67,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 👏 Credits
 
-This project is based on [Papergram](https://github.com/cneuralnetwork/papergram) by CNEURALNETWORK
+This project is based on [Papergram](https://github.com/cneuralnetwork/papergram) by cneuralnetwork
