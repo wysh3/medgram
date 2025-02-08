@@ -2,7 +2,7 @@
 
 A specialized interface for exploring cutting-edge medical research papers from arXiv, focusing on clinical trials, epidemiology, and biomedical studies.
 
-[Try Paper Gram →](https://wysh3.github.io/medgram/)
+[Try [Medgram](https://wysh3.github.io/medgram/)
 
 ## 🌟 Features
 
