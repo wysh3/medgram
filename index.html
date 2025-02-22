@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Medgram - A modern platform for discovering and sharing medical research papers with TikTok-style scrolling experience">
+    <meta name="keywords" content="medical research, papers, scientific articles, medicine, research, academic">
+    <meta name="author" content="Medgram">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://medgram.com/">
+    <meta property="og:title" content="Medgram - Modern Medical Research Discovery">
+    <meta property="og:description" content="Discover and share medical research papers with an engaging, modern interface">
+    <meta property="og:image" content="https://medgram.com/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://medgram.com/">
+    <meta property="twitter:title" content="Medgram - Modern Medical Research Discovery">
+    <meta property="twitter:description" content="Discover and share medical research papers with an engaging, modern interface">
+    <meta property="twitter:image" content="https://medgram.com/twitter-image.jpg">
+
     <title>Medgram</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -15,18 +34,21 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button class="favorites-btn" id="favoritesToggle">
+    <button class="favorites-btn" id="favoritesToggle" aria-label="Toggle Favorites Panel">
         Favorites
     </button>
 
-    <div class="favorites-panel" id="favoritesPanel">
-        <div id="favoritesList">
+    <div class="favorites-panel" id="favoritesPanel" role="complementary" aria-label="Favorites Panel">
+        <div id="favoritesList" role="list">
         </div>
     </div>
 
-    <div class="container" id="container">
-    </div>
+    <main class="container" id="container" role="main">
+    </main>
 
+    <noscript>
+        <p>Please enable JavaScript to use Medgram.</p>
+    </noscript>
 
 <script src="script.js"></script>
 </body>

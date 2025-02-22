@@ -19,11 +19,27 @@ const container = document.getElementById('container');
                 const item = document.createElement('div');
                 item.className = 'favorite-item';
                 item.innerHTML = `
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">${paper.title}</div>
-                    <div style="font-size: 0.8rem; color: var(--secondary-text);">${paper.authors}</div>
+                    <div class="favorite-item-content">
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">${paper.title}</div>
+                        <div style="font-size: 0.8rem; color: var(--secondary-text);">${paper.authors}</div>
+                    </div>
+                    <button class="remove-favorite" title="Remove from favorites">×</button>
                 `;
-                item.addEventListener('click', () => {
+                const content = item.querySelector('.favorite-item-content');
+                content.addEventListener('click', () => {
                     window.open(paper.link, '_blank');
+                });
+
+                const removeBtn = item.querySelector('.remove-favorite');
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const index = favorites.findIndex(f => f.title === paper.title);
+                    if (index !== -1) {
+                        favorites.splice(index, 1);
+                        localStorage.setItem('favorites', JSON.stringify(favorites));
+                        updateFavoritesList();
+                        renderPapers();
+                    }
                 });
                 favoritesList.appendChild(item);
             });
@@ -50,46 +66,93 @@ const container = document.getElementById('container');
             if (isLoading) return;
             isLoading = true;
             
+            // Start fetching papers silently
+            const currentScrollPosition = container.scrollTop;
+            
             try {
                 const query = 'cat:q-bio+OR+cat:med+OR+cat:q-bio.BM+OR+cat:q-bio.GN+OR+cat:q-bio.MN+OR+cat:q-bio.NC+OR+cat:q-bio.OT+OR+cat:q-bio.PE+OR+cat:q-bio.QM+OR+cat:q-bio.SC+OR+cat:q-bio.TO';
                 const response = await fetch(
                     `https://export.arxiv.org/api/query?search_query=${query}&start=${start}&max_results=10&sortBy=submittedDate&sortOrder=descending`
                 );
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const text = await response.text();
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(text, 'text/xml');
-                const entries = xmlDoc.getElementsByTagName('entry');
-            const newPapers = Array.from(entries).map(entry => ({
-                title: entry.getElementsByTagName('title')[0].textContent,
-                authors: Array.from(entry.getElementsByTagName('author'))
-                    .map(author => author.getElementsByTagName('name')[0].textContent)
-                    .join(', '),
-                abstract: entry.getElementsByTagName('summary')[0].textContent,
-                published: new Date(entry.getElementsByTagName('published')[0].textContent)
-                    .toLocaleDateString(),
-                link: entry.getElementsByTagName('id')[0].textContent
-            }));
-            papers = [...papers, ...newPapers];
-            startIndex += newPapers.length;
-            
-            renderPapers();
-            updateFavoritesList();
-            
-            // Auto-refresh every 5 minutes only if user is at the top
-            setTimeout(() => {
-                const container = document.getElementById('container');
-                if (currentIndex === 0 && container.scrollTop === 0) {
-                    papers = [];
-                    startIndex = 0;
-                    fetchPapers();
+                
+                // Check for parsing errors
+                const parserError = xmlDoc.querySelector('parsererror');
+                if (parserError) {
+                    throw new Error('XML parsing failed');
                 }
-            }, 300000);
-        } catch (error) {
-            console.error('Error fetching papers:', error);
-        } finally {
-            isLoading = false;
+                
+                const entries = xmlDoc.getElementsByTagName('entry');
+                if (entries.length === 0) {
+                    showToast('No more papers available');
+                    return;
+                }
+                
+                const newPapers = Array.from(entries).map(entry => ({
+                    title: entry.getElementsByTagName('title')[0]?.textContent || 'Untitled',
+                    authors: Array.from(entry.getElementsByTagName('author'))
+                        .map(author => author.getElementsByTagName('name')[0]?.textContent || 'Unknown')
+                        .join(', '),
+                    abstract: entry.getElementsByTagName('summary')[0]?.textContent || 'No abstract available',
+                    published: new Date(entry.getElementsByTagName('published')[0]?.textContent || Date.now())
+                        .toLocaleDateString(),
+                    link: entry.getElementsByTagName('id')[0]?.textContent || '#'
+                }));
+                
+                papers = [...papers, ...newPapers];
+                startIndex += newPapers.length;
+                
+                renderPapers();
+                updateFavoritesList();
+                
+                // Auto-refresh with error handling
+                setTimeout(() => {
+                    try {
+                        const container = document.getElementById('container');
+                        if (currentIndex === 0 && container.scrollTop === 0) {
+                            papers = [];
+                            startIndex = 0;
+                            fetchPapers();
+                        }
+                    } catch (error) {
+                        console.error('Auto-refresh error:', error);
+                        showToast('Failed to refresh papers');
+                    }
+                }, 300000);
+                
+            } catch (error) {
+                console.error('Error fetching papers:', error);
+                showToast('Failed to load papers. Please try again later.');
+            } finally {
+                isLoading = false;
+                // Restore scroll position to prevent jump
+                container.scrollTop = currentScrollPosition;
+            }
         }
-    }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Trigger reflow
+            toast.offsetHeight;
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
         function renderLatex(element) {
             renderMathInElement(element, {
@@ -257,8 +320,7 @@ const container = document.getElementById('container');
                         </div>
                         <div class="paper-header">
                             <h2 class="title">${paper.title}</h2>
-<div class="authors">${paper.authors.split(', ').length > 4 ? paper.authors.split(', ').slice(0, 4).join(', ') + ', et al.' : paper.authors}</div>
-
+                            <div class="authors">${paper.authors.split(', ').length > 4 ? paper.authors.split(', ').slice(0, 4).join(', ') + ', et al.' : paper.authors}</div>
                         </div>
                         <div class="key-results">
                             ${keyResults.map(result => `
@@ -272,25 +334,50 @@ const container = document.getElementById('container');
                         <div class="metadata">
                             <span>${paper.published}</span>
                             <button class="like-button ${isLiked ? 'liked' : ''}">${isLiked ? '❤️' : '🤍'}</button>
-                            <a href="${paper.link}" target="_blank" class="read-more">Read More</a>
+                            <a href="${paper.link}" target="blank" class="read-more">Read More</a>
                         </div>
+                        <div class="heart-animation"></div>
                     </div>
                 `;
+            const twitterBtn = paperCard.querySelector('.twitter-share');
+        const linkedinBtn = paperCard.querySelector('.linkedin-share');
+        const copyBtn = paperCard.querySelector('.copy-link');
+        const likeButton = paperCard.querySelector('.like-button');
+        const paperContent = paperCard.querySelector('.paper-content');
 
-                const twitterBtn = paperCard.querySelector('.twitter-share');
-                const linkedinBtn = paperCard.querySelector('.linkedin-share');
-                const copyBtn = paperCard.querySelector('.copy-link');
-                const likeButton = paperCard.querySelector('.like-button');
+        let lastTap = 0;
+        let touchTimeout;
 
-                twitterBtn.addEventListener('click', () => sharePaper('twitter', paper));
-                linkedinBtn.addEventListener('click', () => sharePaper('linkedin', paper));
-                copyBtn.addEventListener('click', () => sharePaper('copy', paper));
-                likeButton.addEventListener('click', () => toggleFavorite(paper, likeButton));
+        paperContent.addEventListener('touchstart', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
 
-                container.appendChild(paperCard);
-                renderLatex(paperCard);
-            });
-        }
+            if (tapLength < 500 && tapLength > 0) {
+                clearTimeout(touchTimeout);
+                const touch = e.touches[0];
+                const heartAnimation = paperCard.querySelector('.heart-animation');
+                heartAnimation.style.left = `${touch.clientX - paperCard.offsetLeft}px`;
+                heartAnimation.style.top = `${touch.clientY - paperCard.offsetTop}px`;
+                heartAnimation.classList.add('active');
+                setTimeout(() => heartAnimation.classList.remove('active'), 1000);
+                toggleFavorite(paper, likeButton);
+                e.preventDefault();
+            } else {
+                touchTimeout = setTimeout(() => {
+                    lastTap = currentTime;
+                }, 300);
+            }
+        });
+
+        twitterBtn.addEventListener('click', () => sharePaper('twitter', paper));
+        linkedinBtn.addEventListener('click', () => sharePaper('linkedin', paper));
+        copyBtn.addEventListener('click', () => sharePaper('copy', paper));
+        likeButton.addEventListener('click', () => toggleFavorite(paper, likeButton));
+
+        container.appendChild(paperCard);
+        renderLatex(paperCard);
+    });
+}
 
         function extractKeyResults(abstract) {
             const results = [];
