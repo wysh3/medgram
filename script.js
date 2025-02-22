@@ -436,11 +436,17 @@ function generatePaperMedia(paper) {
     return ''; 
 }
 
+let scrollTimeout;
+container.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(handleScroll, 100);
+});
+
 function handleScroll() {
     const cards = document.querySelectorAll('.paper-card');
     cards.forEach((card, index) => {
         const rect = card.getBoundingClientRect();
-        if (Math.abs(rect.top - 60) < window.innerHeight / 2) {
+        if (Math.abs(rect.top) < window.innerHeight / 2) {
             card.classList.add('active');
             currentIndex = index;
         } else {
@@ -463,8 +469,6 @@ function scrollToIndex(index) {
         cards[index].scrollIntoView({ behavior: 'smooth' });
     }
 }
-
-container.addEventListener('scroll', handleScroll);
 
 let touchStartY = 0;
 let touchEndY = 0;

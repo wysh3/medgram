@@ -6,7 +6,7 @@
     --secondary-text: #94a3b8;
 }
 
-/* hide scrollbar */
+/* Hide scrollbar */
 ::-webkit-scrollbar {
     display: none;
 }
@@ -39,7 +39,6 @@ body {
 .container {
     height: 100vh;
     overflow-y: scroll;
-    scroll-snap-type: y mandatory;
     position: relative;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -56,9 +55,6 @@ body {
 
 .paper-card {
     min-height: 100vh;
-    height: 100%;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -76,7 +72,8 @@ body {
 }
 
 .paper-content {
-    margin: 1rem auto;
+    height: 100%; /* Take full height of the card */
+    overflow-y: auto; /* Allow scrolling if content is too long */
     background: var(--card-bg);
     padding: 1.25rem;
     border-radius: 12px;
@@ -88,7 +85,6 @@ body {
     transform: translateY(20px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    overflow: hidden;
     box-sizing: border-box;
     will-change: transform, opacity;
 }
@@ -161,7 +157,6 @@ body {
     line-height: 1.6;
     color: var(--text-color);
     margin-bottom: 1.5rem;
-    overflow-y: scroll;
     word-wrap: break-word;
 }
 
@@ -191,11 +186,8 @@ body {
 .controls {
     display: none;
 }
-
 .favorites-panel {
     position: fixed;
-    top: 60px;
-    right: 20px;
     background: var(--card-bg);
     border: 1px solid var(--accent-color);
     border-radius: 12px;
@@ -204,10 +196,27 @@ body {
     max-height: 70vh;
     overflow-y: auto;
     z-index: 1000;
-    transform: translateX(120%);
-    transition: transform 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
+.share-popup {
+    position: fixed;
+    background: var(--card-bg);
+    border: 1px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 1rem;
+    z-index: 1002;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    width: 300px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
 .favorites-panel.show {
     transform: translateX(0);
 }
@@ -276,6 +285,27 @@ body {
     justify-content: space-around;
     padding: 10px 0;
     z-index: 1000;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.left-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(100, 255, 218, 0.1);
 }
 
 .bottom-nav a, .bottom-nav button {
@@ -319,9 +349,6 @@ body {
 
 .share-popup {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
     background: var(--card-bg);
     border: 1px solid var(--accent-color);
     border-radius: 12px;
@@ -330,6 +357,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    width: 300px;
 }
 
 .share-popup.show {
@@ -348,14 +376,17 @@ body {
     background: none;
     border: none;
     color: var(--accent-color);
-    padding: 0.5rem;
+    padding: 0.75rem;
     text-align: left;
     cursor: pointer;
     font-size: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
 
 .share-option:hover {
     background: rgba(100, 255, 218, 0.1);
+    transform: translateX(5px);
 }
 
 @media (min-width: 769px) {
@@ -364,6 +395,29 @@ body {
     }
     .left-nav {
         display: flex;
+    }
+    .favorites-panel {
+        top: 50%;
+        left: 70px;
+        transform: translateY(-50%) translateX(-120%) scale(0.9);
+    }
+    
+    .favorites-panel.show {
+        transform: translateY(-50%) translateX(0) scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .share-popup {
+        top: 50%;
+        left: 70px;
+        transform: translateY(-50%) translateX(-120%) scale(0.9);
+    }
+
+    .share-popup.show {
+        transform: translateY(-50%) translateX(0) scale(1);
+        opacity: 1;
+        visibility: visible;
     }
 }
 
@@ -381,8 +435,8 @@ body {
     }
 
     .container {
-        height: 100%;
-        min-height: 100vh;
+        height: 100vh;
+        padding-bottom: 60px; /* Adjusted to avoid overlap with bottom nav */
     }
 
     .paper-content {
@@ -421,10 +475,32 @@ body {
     }
 
     .favorites-panel {
-        width: calc(100% - 30px);
-        top: 50px;
-        right: 15px;
-        max-height: 60vh;
+        position: fixed;
+        bottom: 70px;
+        left: 50%;
+        transform: translateX(-50%) translateY(120%) scale(0.9);
+        width: calc(100% - 2rem);
+        z-index: 1005;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .favorites-panel.show {
+        transform: translateX(-50%) translateY(0) scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+    .share-popup {
+        bottom: 70px;
+        left: 50%;
+        transform: translateX(-50%) translateY(120%) scale(0.9);
+        width: calc(100% - 2rem);
+    }
+
+    .share-popup.show {
+        transform: translateX(-50%) translateY(0) scale(1);
+        opacity: 1;
+        visibility: visible;
     }
 
     .favorite-item {
@@ -452,12 +528,7 @@ body {
 
     .paper-card {
         padding: 0.5rem;
-        height: calc(100vh - 50px); 
-    }
-
-    .container {
-        padding-top: 50px; 
-        padding-bottom: 60px; /* Add padding to avoid overlap with bottom nav */
+        height: 100vh;
     }
 
     .toast {
@@ -468,7 +539,7 @@ body {
 
     .swipe-hint {
         font-size: 0.7rem;
-        bottom: 75px; /* Adjust to avoid overlap with bottom nav */
+        bottom: 75px; /* Adjusted to avoid overlap with bottom nav */
     }
 }
 
