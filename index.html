@@ -34,12 +34,30 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button class="favorites-btn" id="favoritesToggle" aria-label="Toggle Favorites Panel">
-        Favorites
-    </button>
+    <div class="bottom-nav">
+        <a href="https://github.com/wysh3/medgram" target="_blank"><i class="fab fa-github"></i></a>
+        <button id="favorite-toggle"><i class="fas fa-heart"></i></button>
+        <button id="home-btn"><i class="fas fa-home"></i></button>
+        <button id="share-btn"><i class="fas fa-share"></i></button>
+    </div>
+
+    <div class="left-nav">
+        <button id="home-btn-desktop"><i class="fas fa-home"></i></button>
+        <button id="favorite-toggle-desktop"><i class="fas fa-heart"></i></button>
+        <button id="share-btn-desktop"><i class="fas fa-share"></i></button>
+        <a href="https://github.com/wysh3/medgram" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
 
     <div class="favorites-panel" id="favoritesPanel" role="complementary" aria-label="Favorites Panel">
         <div id="favoritesList" role="list">
+        </div>
+    </div>
+
+    <div class="share-popup" id="sharePopup" role="dialog" aria-label="Share Options">
+        <div class="share-options">
+            <button class="share-option twitter-share"><i class="fab fa-twitter"></i> Twitter</button>
+            <button class="share-option linkedin-share"><i class="fab fa-linkedin-in"></i> LinkedIn</button>
+            <button class="share-option copy-link"><i class="fas fa-link"></i> Copy Link</button>
         </div>
     </div>
 
@@ -50,6 +68,6 @@
         <p>Please enable JavaScript to use Medgram.</p>
     </noscript>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
