@@ -59,29 +59,37 @@ const container = document.getElementById('container');
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(text, 'text/xml');
                 const entries = xmlDoc.getElementsByTagName('entry');
-
-                const newPapers = Array.from(entries).map(entry => ({
-                    title: entry.getElementsByTagName('title')[0].textContent,
-                    authors: Array.from(entry.getElementsByTagName('author'))
-                        .map(author => author.getElementsByTagName('name')[0].textContent)
-                        .join(', '),
-                    abstract: entry.getElementsByTagName('summary')[0].textContent,
-                    published: new Date(entry.getElementsByTagName('published')[0].textContent)
-                        .toLocaleDateString(),
-                    link: entry.getElementsByTagName('id')[0].textContent
-                }));
-
-                papers = [...papers, ...newPapers];
-                startIndex += newPapers.length;
-                
-                renderPapers();
-                updateFavoritesList();
-            } catch (error) {
-                console.error('Error fetching papers:', error);
-            } finally {
-                isLoading = false;
-            }
+            const newPapers = Array.from(entries).map(entry => ({
+                title: entry.getElementsByTagName('title')[0].textContent,
+                authors: Array.from(entry.getElementsByTagName('author'))
+                    .map(author => author.getElementsByTagName('name')[0].textContent)
+                    .join(', '),
+                abstract: entry.getElementsByTagName('summary')[0].textContent,
+                published: new Date(entry.getElementsByTagName('published')[0].textContent)
+                    .toLocaleDateString(),
+                link: entry.getElementsByTagName('id')[0].textContent
+            }));
+            papers = [...papers, ...newPapers];
+            startIndex += newPapers.length;
+            
+            renderPapers();
+            updateFavoritesList();
+            
+            // Auto-refresh every 5 minutes only if user is at the top
+            setTimeout(() => {
+                const container = document.getElementById('container');
+                if (currentIndex === 0 && container.scrollTop === 0) {
+                    papers = [];
+                    startIndex = 0;
+                    fetchPapers();
+                }
+            }, 300000);
+        } catch (error) {
+            console.error('Error fetching papers:', error);
+        } finally {
+            isLoading = false;
         }
+    }
 
         function renderLatex(element) {
             renderMathInElement(element, {

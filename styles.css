@@ -60,17 +60,13 @@ body {
     height: 100vh;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
-    padding-top: 60px;
+    position: relative;
 }
 
 .paper-card {
-    margin: auto;
-    content-visibility: auto;
-    contain-intrinsic-size: 1000px;
-    min-height: calc(100vh - 100px);
+    height: 100vh;
     scroll-snap-align: start;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 1rem;
@@ -80,15 +76,15 @@ body {
 .paper-content {
     margin: auto;
     margin-top: 2rem;
-      background: var(--card-bg);
+    background: var(--card-bg);
     padding: 1.25rem;
     border-radius: 12px;
     border: 1px solid rgba(100, 255, 218, 0.1);
     width: calc(100% - 2rem);
-
     max-width: 600px;
     backdrop-filter: blur(10px);
     opacity: 0;
+    transform: translateY(20px);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -98,7 +94,6 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
-
 .title {
     font-size: 1rem;
     font-family: "Junicode", monospace;
