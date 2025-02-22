@@ -335,7 +335,7 @@ function renderPapers() {
         paperCard.innerHTML = `
             <div class="paper-content">
                 <div class="paper-header">
-                    <h2 class="title">${paper.title}</h2>
+                    <h2 class="title" onclick="window.open('${paper.link}', '_blank')">${paper.title}</h2>
                     <div class="authors">${paper.authors.split(', ').length > 4 ? paper.authors.split(', ').slice(0, 4).join(', ') + ', et al.' : paper.authors}</div>
                 </div>
                 <div class="key-results">
