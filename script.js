@@ -351,22 +351,27 @@ const container = document.getElementById('container');
         paperContent.addEventListener('touchstart', (e) => {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
-
-            if (tapLength < 500 && tapLength > 0) {
-                clearTimeout(touchTimeout);
+            
+            clearTimeout(touchTimeout);
+            
+            if (tapLength < 300 && tapLength > 0) {
+                // Double tap detected
                 const touch = e.touches[0];
+                const rect = paperCard.getBoundingClientRect();
                 const heartAnimation = paperCard.querySelector('.heart-animation');
-                heartAnimation.style.left = `${touch.clientX - paperCard.offsetLeft}px`;
-                heartAnimation.style.top = `${touch.clientY - paperCard.offsetTop}px`;
+                
+                // Calculate position relative to the card
+                heartAnimation.style.left = `${touch.clientX - rect.left}px`;
+                heartAnimation.style.top = `${touch.clientY - rect.top}px`;
+                
                 heartAnimation.classList.add('active');
-                setTimeout(() => heartAnimation.classList.remove('active'), 1000);
+                setTimeout(() => heartAnimation.classList.remove('active'), 800);
+                
                 toggleFavorite(paper, likeButton);
                 e.preventDefault();
-            } else {
-                touchTimeout = setTimeout(() => {
-                    lastTap = currentTime;
-                }, 300);
             }
+            
+            lastTap = currentTime;
         });
 
         twitterBtn.addEventListener('click', () => sharePaper('twitter', paper));
@@ -478,4 +483,96 @@ const container = document.getElementById('container');
         }
 
         fetchPapers();
+document.addEventListener('DOMContentLoaded', () => {
+    let currentIndex = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+    const container = document.getElementById('container');
+    const cards = document.getElementsByClassName('paper-card');
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
+            e.preventDefault();
+            navigateCards('up');
+        } else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            navigateCards('down');
+        }
+    });
+
+    // Touch events
+    container.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    container.addEventListener('touchend', (e) => {
+        touchEndY = e.changedTouches[0].clientY;
+        const deltaY = touchEndY - touchStartY;
+
+        if (Math.abs(deltaY) > 50) { // Minimum swipe distance
+            if (deltaY > 0) {
+                navigateCards('up');
+            } else {
+                navigateCards('down');
+            }
+        }
+    }, { passive: true });
+
+    // Mouse wheel navigation
+    let wheelTimeout;
+    container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        
+        if (wheelTimeout) return;
+        
+        wheelTimeout = setTimeout(() => {
+            if (e.deltaY > 0) {
+                navigateCards('down');
+            } else {
+                navigateCards('up');
+            }
+            wheelTimeout = null;
+        }, 50);
+    }, { passive: false });
+
+    function navigateCards(direction) {
+        if (direction === 'up' && currentIndex > 0) {
+            currentIndex--;
+        } else if (direction === 'down' && currentIndex < cards.length - 1) {
+            currentIndex++;
+        }
+
+        cards[currentIndex].scrollIntoView({ behavior: 'smooth' });
+        updateActiveCard();
+    }
+
+    function updateActiveCard() {
+        Array.from(cards).forEach((card, index) => {
+            if (index === currentIndex) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+    }
+
+    // Initialize first card as active
+    updateActiveCard();
+
+    // Intersection Observer for better scroll snap
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const index = Array.from(cards).indexOf(entry.target);
+                currentIndex = index;
+                updateActiveCard();
+            }
+        });
+    }, {
+        threshold: 0.5
+    });
+
+    Array.from(cards).forEach(card => observer.observe(card));
+});
 
