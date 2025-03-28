@@ -6,7 +6,7 @@
     <meta name="description" content="Medgram - A modern platform for discovering and sharing medical research papers with TikTok-style scrolling experience">
     <meta name="keywords" content="medical research, papers, scientific articles, medicine, research, academic">
     <meta name="author" content="Medgram">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://medgram.com/">
@@ -34,19 +34,16 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="bottom-nav">
-        <a href="https://github.com/wysh3/medgram" target="_blank"><i class="fab fa-github"></i></a>
-        <button id="favorite-toggle"><i class="fas fa-heart"></i></button>
-        <button id="home-btn"><i class="fas fa-home"></i></button>
-        <button id="share-btn"><i class="fas fa-share"></i></button>
-    </div>
+    <!-- Initial Overlays -->
+    <div class="overlay-logo" id="overlayLogo">Medgram</div>
+    <div class="overlay-hint" id="overlayHint"></div>
 
-    <div class="left-nav">
-        <button id="home-btn-desktop"><i class="fas fa-home"></i></button>
-        <button id="favorite-toggle-desktop"><i class="fas fa-heart"></i></button>
-        <button id="share-btn-desktop"><i class="fas fa-share"></i></button>
-        <a href="https://github.com/wysh3/medgram" target="_blank"><i class="fab fa-github"></i></a>
-    </div>
+    <nav class="main-nav" id="mainNav">
+        <button id="home-btn" title="Home"><i class="fas fa-home"></i></button>
+        <button id="favorite-toggle" title="Favorites"><i class="fas fa-heart"></i></button>
+        <button id="share-btn" title="Share"><i class="fas fa-share"></i></button>
+        <a href="https://github.com/wysh3/medgram" target="_blank" title="GitHub Repository"><i class="fab fa-github"></i></a>
+    </nav>
 
     <div class="favorites-panel" id="favoritesPanel" role="complementary" aria-label="Favorites Panel">
         <div id="favoritesList" role="list">
