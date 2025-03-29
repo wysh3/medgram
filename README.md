@@ -69,4 +69,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 👏 Credits
 
-This project is based on [Papergram](https://github.com/cneuralnetwork/papergram) by cneuralnetwork
+Inspired by [Papergram](https://github.com/cneuralnetwork/papergram)
